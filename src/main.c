@@ -1,15 +1,9 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <stdnoreturn.h>
 #include <string.h>
 
-#define FILEPATH "../../files/"
+#include "util.h"
 
-noreturn void error_and_exit(const char* error_msg) {
-  perror(error_msg);
-  // NOLINTNEXTLINE(concurrency-mt-unsafe)
-  exit(EXIT_FAILURE);
-}
+#define FILEPATH "../../files/"
 
 int main(void) {
   const int NUM_FILES = 3;
