@@ -1,6 +1,50 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <stdnoreturn.h>
+#include <string.h>
+
+#define FILEPATH "../../files/"
+
+noreturn void error_and_exit(const char* error_msg) {
+  perror(error_msg);
+  // NOLINTNEXTLINE(concurrency-mt-unsafe)
+  exit(EXIT_FAILURE);
+}
 
 int main(void) {
-  printf("adsf");
+  const int NUM_FILES = 3;
+  const int FILENAME_LEN = 20;
+
+  char filenames[NUM_FILES][FILENAME_LEN];
+
+  strcpy(filenames[0], "a.txt");
+  strcpy(filenames[1], "b.txt");
+  strcpy(filenames[2], "c.txt");
+
+  FILE* files[NUM_FILES];
+
+  for (int i = 0; i < NUM_FILES; ++i) {
+    char full_path[30] = FILEPATH;
+    strcat(full_path, filenames[i]);
+    files[i] = fopen(full_path, "w+e");
+    if (!files[i]) {
+      error_and_exit("Couldn't open file");
+    }
+  }
+
+  char* line = "hello";
+
+  for (int i = 0; i < NUM_FILES; ++i) {
+    if (fputs(line, files[i]) == EOF) {
+      error_and_exit("Couldn't write to file");
+    }
+  }
+
+  for (int i = 0; i < NUM_FILES; ++i) {
+    if (fclose(files[i])) {
+      error_and_exit("Couldn't close file");
+    }
+  }
+
   return 0;
 }
