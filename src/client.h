@@ -3,6 +3,8 @@
 #include <netinet/in.h>  // sockaddr_in
 #include <stdio.h>       // FILE
 
+enum { BUFFER_SIZE = 1024 };
+
 /**
  * Attempt to connect to a server on a given socket.
  *
@@ -47,3 +49,7 @@ FILE* get_socket_file(int client_socket);
  * (which may be EOF).
  */
 int echo(FILE* socket_file);
+
+void create_listener(int client_socketFD);
+
+void listen_and_print(int client_socketFD);
