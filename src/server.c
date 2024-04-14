@@ -32,8 +32,11 @@ accepted_socket* accept_connection(int server_socketFD) {
   return accepted;
 }
 
-void recv_and_print(int client_socketFD) {
-  char buffer[1024];
+void* recv_and_print(void* arg) {
+  printf("void version\n");
+  char buffer[BUFFER_SIZE];
+
+  int client_socketFD = *(int*)arg;
 
   while (1) {
     ssize_t txt_received = recv(client_socketFD, buffer, BUFFER_SIZE, 0);
@@ -48,11 +51,13 @@ void recv_and_print(int client_socketFD) {
     }
   }
   close(client_socketFD);
+  return NULL;
 }
 
 void create_client_thread(accepted_socket* accepted) {
   pthread_t id = 0;
-  pthread_create(&id, NULL, recv_and_print, accepted->accepted_socketFD);
+  pthread_create(&id, NULL, recv_and_print,
+                 (void*)&accepted->accepted_socketFD);
 }
 
 void start_accepting(int server_socketFD) {

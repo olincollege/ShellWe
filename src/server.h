@@ -95,6 +95,6 @@ accepted_socket* accept_connection(int server_socketFD);
 
 void start_accepting(int server_socketFD);
 
-void recv_and_print(int client_socketFD);
+void* recv_and_print(void* arg);
 
 void create_client_thread(accepted_socket* accepted);
