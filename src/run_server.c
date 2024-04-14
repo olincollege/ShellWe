@@ -1,16 +1,30 @@
 #include <arpa/inet.h>  // sockaddr_in
+#include <stdio.h>
 
 #include "server.h"  // echo_server, related functions
 #include "util.h"    // socket_address, PORT
 
 int main(void) {
-  struct sockaddr_in server_addr = socket_address(0xc0a820e9, PORT);
-  echo_server* server = make_echo_server(server_addr, BACKLOG_SIZE);
-  listen_for_connections(server);
-  int accept_status = 0;
-  while (accept_status != -1) {
-    accept_status = accept_client(server);
+  printf("Welcome to ShellWe!\n");
+  accepted_socket acceptedSockets[BACKLOG_SIZE];
+  int acceptedSocketsCount = 0;
+
+  struct sockaddr_in server_addr = socket_address(INADDR_LOOPBACK, PORT);
+
+  int server_socketFD = open_tcp_socket();
+
+  if (bind(server_socketFD, (struct sockaddr*)&server_addr,
+           sizeof(server_addr)) == -1) {
+    perror("Socket bound failed");
   }
-  free_echo_server(server);
+
+  if (listen(server_socketFD, BACKLOG_SIZE) == -1) {
+    perror("Socket listen failed");
+  }
+
+  start_accepting(server_socketFD);
+
+  shutdown(server_socketFD, SHUT_RDWR);
+
   return 0;
 }

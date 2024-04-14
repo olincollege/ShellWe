@@ -1,5 +1,6 @@
 #include <arpa/inet.h>  // INADDR_LOOPBACK, inet_ntop
 #include <stdio.h>      // fprintf
+#include <string.h>
 
 #include "client.h"
 #include "util.h"
@@ -21,18 +22,18 @@ int main(void) {
       inet_ntop(AF_INET, &server_addr.sin_addr, addr_string, MAX_IP_ADDR_LEN),
       PORT);
 
-  // Use a file pointer to make it easier to deal with text lines.
-  FILE* socket_file = get_socket_file(socket_descriptor);
-  // Echo until either the client or the server closes its stream.
-  int socket_file_status = 0;
-  while (socket_file_status != -1) {
-    socket_file_status = echo(socket_file);
-  }
+  char* line = NULL;
+  size_t line_size = 0;
+  while (1) {
+    ssize_t char_count = getline(&line, &line_size, stdin);
 
-  // If we didn't hit the end of file for either stdin or the response from the
-  // server, then something went wrong.
-  if (!feof(stdin) && !feof(socket_file)) {
-    error_and_exit("Error reading or writing line:");
+    if (char_count > 0) {
+      if (strcmp(line, "exit\n") == 0) {
+        break;
+      }
+
+      ssize_t txt_sent = send(socket_descriptor, line, line_size, 0);
+    }
   }
 
   // Clean up and exit.

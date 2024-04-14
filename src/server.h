@@ -3,7 +3,14 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 
-enum { BACKLOG_SIZE = 10 };
+enum { BACKLOG_SIZE = 10, BUFFER_SIZE = 1024 };
+
+typedef struct {
+  int accepted_socketFD;
+  struct sockaddr_in addr;
+  int error;
+  int accept_success;
+} accepted_socket;
 
 // Group the data needed for a server to run.
 typedef struct {
@@ -83,3 +90,11 @@ int accept_client(echo_server* server);
  * @param socket_descriptor The socket descriptor for the client connection.
  */
 void echo(int socket_descriptor);
+
+accepted_socket* accept_connection(int server_socketFD);
+
+void start_accepting(int server_socketFD);
+
+void recv_and_print(int client_socketFD);
+
+void create_client_thread(accepted_socket* accepted);
