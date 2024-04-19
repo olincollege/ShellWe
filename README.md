@@ -28,3 +28,6 @@ application, both written in C.
       current client, pointer to number of connected clients, pointer to an
       array of socket FD, and a pointer to the shared mutex for client socket FD
       array. This is used as an argument for client handler thread.
+
+| ![Container Diagram](./docs/container.jpg) |
+|--------------------------------------------|
