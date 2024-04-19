@@ -12,13 +12,21 @@
 
 void* receive_message(void* socket_desc) {
   int sock = *(int*)socket_desc;
-  FILE* socket_file = get_socket_file(sock);
-
+  char buffer[1024];
   char* recv_line = NULL;
-  size_t recv_line_size = 0;
 
-  while (getline(&recv_line, &recv_line_size, socket_file) != -1) {
-    puts(recv_line);
+  while (1) {
+    ssize_t len = recv(sock, buffer+1, sizeof(buffer)-2, 0);
+    if (len > 0) {
+      buffer[0] = '\n';
+      buffer[len + 1] = '\0';
+      printf("%s\n", buffer);
+      printf(">> ");
+      fflush(stdout);
+    } else {
+      perror("recv failed");
+      break;
+    }
   }
 
   free(recv_line);
@@ -47,11 +55,18 @@ int main(void) {
   }
 
   size_t len = 0;
-  char* username = "username"; // replace with actual username
-  char* prefix = ">> ";
+  char* username = NULL; // replace with actual username
+  size_t username_len = 0;
+  char* prefix = " >> ";
+  printf("Enter username : ");
+  if (getline(&username, &username_len, stdin) == -1) {
+    close_tcp_socket(sock);
+    error_and_exit("Setting username failed");
+  }
 
   while (1) {
-    puts("Enter message : ");
+    printf(">> ");
+    fflush(stdout);
     if (getline(&message, &len, stdin) == -1) {
       close_tcp_socket(sock);
       error_and_exit("Read failed");
@@ -61,7 +76,13 @@ int main(void) {
     strcpy(full_message, username);
     strcat(full_message, prefix);
     strcat(full_message, message);
-
+    int i, j;
+    for (i = 0, j = 0; full_message[i] != '\0'; i++) {
+      if (full_message[i] != '\n') {
+        full_message[j++] = full_message[i];
+      }
+    }
+    full_message[j] = '\0'; // Null-terminate the modified string
     if (send(sock, full_message, strlen(full_message), 0) < 0) {
       close_tcp_socket(sock);
       error_and_exit("Send failed");
