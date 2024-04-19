@@ -1,15 +1,12 @@
-#include <arpa/inet.h>
 #include <netinet/in.h>
 #include <pthread.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
-#include <unistd.h>
 
 #include "../util/util.h"
 
-#define SERVER_IP "127.0.0.1"
+#define SERVER_IP 0x7f000001
 #define SERVER_PORT 12345
 #define BUFFER_SIZE 1024
 
@@ -34,42 +31,37 @@ void* receive_message(void* socket_desc) {
 }
 
 int main(void) {
-  struct sockaddr_in server;
   char* message = NULL;
   pthread_t recv_thread;
 
   int sock = open_tcp_socket();
 
-  server.sin_addr.s_addr = inet_addr(SERVER_IP);
-  server.sin_family = AF_INET;
-  server.sin_port = htons(SERVER_PORT);
+  struct sockaddr_in server = socket_address(SERVER_IP, SERVER_PORT);
 
   if (connect(sock, (struct sockaddr*)&server, sizeof(server)) < 0) {
-    perror("connect failed. Error");
-    return 1;
+    close_tcp_socket(sock);
+    error_and_exit("connect failed. Error");
   }
 
-  puts("Connected\n");
+  puts("Connected to server\n");
 
   if (pthread_create(&recv_thread, NULL, receive_message, (void*)&sock) != 0) {
-    perror("could not create thread");
-    return 1;
+    close_tcp_socket(sock);
+    error_and_exit("could not create thread");
   }
+
+  size_t len = 0;
 
   while (1) {
-    printf("Enter message : ");
-    size_t len = 0;
-    ssize_t read = getline(&message, &len, stdin);
-
-    if (read == -1) {
-      puts("Read failed");
-      return 1;
+    puts("Enter message : ");
+    if (getline(&message, &len, stdin) == -1) {
+      close_tcp_socket(sock);
+      error_and_exit("Read failed");
     }
+
     if (send(sock, message, strlen(message), 0) < 0) {
-      puts("Send failed");
-      return 1;
+      close_tcp_socket(sock);
+      error_and_exit("Send failed");
     }
   }
-  close(sock);
-  return 0;
 }
