@@ -8,7 +8,6 @@
 
 #include "../util/util.h"
 #include "client_handler.h"
-#include "sys/_pthread/_pthread_t.h"
 
 int main(void) {
   int client_sockets[MAX_CLIENTS];
@@ -40,8 +39,9 @@ int main(void) {
       perror("accept failed");
       break;
     }
-    printf("Connection accepted from %s:%d\n", inet_ntoa(client.sin_addr),
-           ntohs(client.sin_port));
+    char ip_str[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, &(client.sin_addr), ip_str, INET_ADDRSTRLEN);
+    printf("Connection accepted from %s:%d\n", ip_str, ntohs(client.sin_port));
 
     pthread_mutex_lock(&clients_mutex);
     client_sockets[(*n_clients)++] = new_socket;
