@@ -11,7 +11,7 @@
 
 int main(void) {
   char* message = NULL;
-  pthread_t recv_thread = NULL;
+  pthread_t recv_thread = 0;
 
   int sock = open_tcp_socket();
 
