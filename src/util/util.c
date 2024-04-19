@@ -30,3 +30,11 @@ struct sockaddr_in socket_address(in_addr_t addr, in_port_t port) {
                                  .sin_family = AF_INET};
   return sockaddr;
 }
+
+FILE* get_socket_file(int socket) {
+  FILE* socket_file = fdopen(socket, "w+");
+  if (socket_file == NULL) {
+    error_and_exit("Couldn't open socket as file stream");
+  }
+  return socket_file;
+}

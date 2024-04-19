@@ -2,6 +2,7 @@
 
 #include <netinet/in.h>   // port, struct sockaddr_in, in_addr_t, in_port_t
 #include <stdnoreturn.h>  // noreturn
+#include <stdio.h>
 
 /**
  * Print an error message and exit with a failure status code.
@@ -50,3 +51,5 @@ void close_tcp_socket(int socket_descriptor);
  * @return A sockaddr_in structure to use with bind/connect, in network order.
  */
 struct sockaddr_in socket_address(in_addr_t addr, in_port_t port);
+
+FILE* get_socket_file(int socket);

@@ -1,6 +1,7 @@
 #include <netinet/in.h>
 #include <pthread.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
 
@@ -8,26 +9,21 @@
 
 #define SERVER_IP 0x7f000001
 #define SERVER_PORT 12345
-#define BUFFER_SIZE 1024
 
 void* receive_message(void* socket_desc) {
   int sock = *(int*)socket_desc;
-  char server_msg[BUFFER_SIZE];
-  ssize_t read_size;
+  FILE* socket_file = get_socket_file(sock);
 
-  while ((read_size = recv(sock, server_msg, BUFFER_SIZE - 1, 0)) > 0) {
-    server_msg[read_size] = '\0';
-    printf("Server reply : %s\n", server_msg);
+  char* recv_line = NULL;
+  size_t recv_line_size = 0;
+
+  while (getline(&recv_line, &recv_line_size, socket_file) != -1) {
+    puts(recv_line);
   }
 
-  if (read_size == 0) {
-    puts("Server disconnected");
-    fflush(stdout);
-  } else if (read_size == -1) {
-    perror("recv failed");
-  }
-
-  return 0;
+  free(recv_line);
+  perror("recv failed");
+  return NULL;
 }
 
 int main(void) {
@@ -51,6 +47,8 @@ int main(void) {
   }
 
   size_t len = 0;
+  char* username = "username"; // replace with actual username
+  char* prefix = ">> ";
 
   while (1) {
     puts("Enter message : ");
@@ -58,10 +56,17 @@ int main(void) {
       close_tcp_socket(sock);
       error_and_exit("Read failed");
     }
+    // Create a new buffer to hold the username, prefix, and message
+    char* full_message = malloc(strlen(username) + strlen(prefix) + strlen(message) + 1);
+    strcpy(full_message, username);
+    strcat(full_message, prefix);
+    strcat(full_message, message);
 
-    if (send(sock, message, strlen(message), 0) < 0) {
+    if (send(sock, full_message, strlen(full_message), 0) < 0) {
       close_tcp_socket(sock);
       error_and_exit("Send failed");
     }
+
+    free(full_message);
   }
 }
