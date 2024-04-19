@@ -1,7 +1,9 @@
 #include "util.h"
 
+#include <netinet/in.h>
 #include <stdio.h>   // perror
 #include <stdlib.h>  // exit, EXIT_FAILURE
+#include <sys/socket.h>
 #include <unistd.h>  // close
 
 void error_and_exit(const char* error_msg) {
