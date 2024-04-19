@@ -28,6 +28,7 @@ set(CMAKE_C_CLANG_TIDY "clang-tidy")
 add_subdirectory(src/server)
 add_subdirectory(src/client)
 add_subdirectory(src/util)
+add_subdirectory(test)
 
 include(CTest)
 find_library(CRITERION criterion REQUIRED)
