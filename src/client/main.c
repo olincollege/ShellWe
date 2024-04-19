@@ -46,11 +46,21 @@ int main(void) {
       close_tcp_socket(sock);
       error_and_exit("Read failed");
     }
-    // Create a new buffer to hold the username, prefix, and message
-    char* full_message = malloc(strlen(username) + strlen(prefix) + strlen(message) + 1);
-    strcpy(full_message, username);
-    strcat(full_message, prefix);
-    strcat(full_message, message);
+
+    size_t full_message_size = strlen(username) + strlen(prefix) + strlen(message) + 1;
+    char* full_message = malloc(full_message_size);
+
+    if (full_message == NULL) {
+      close_tcp_socket(sock);
+      error_and_exit("Failed to allocate memory for message");
+    }
+
+    if(snprintf(full_message, full_message_size, "%s%s%s", username, prefix,
+              message) == -1) {
+      close_tcp_socket(sock);
+      free(full_message);
+      error_and_exit("Failed to concatenate for full message");
+    }
 
     remove_newline(full_message);
 
