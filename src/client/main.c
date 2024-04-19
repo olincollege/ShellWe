@@ -7,7 +7,6 @@
 
 #include "../util/util.h"
 #include "receiver.h"
-#include "sys/_pthread/_pthread_t.h"
 
 
 int main(void) {
