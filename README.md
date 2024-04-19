@@ -3,10 +3,13 @@
 `Shell` `We` chat? Using this application, a user can chat with other users in
 the chat room.
 
-## Introduction
+## Context
 
 The chat system consists of two main parts: a server application and a client
 application, both written in C.
+
+| ![Context Diagram](./docs/context.jpg) | 
+|----------------------------------------|
 
 ## Containers
 
