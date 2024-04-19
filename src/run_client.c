@@ -8,7 +8,7 @@
 const socklen_t MAX_IP_ADDR_LEN = 16;
 
 int main(void) {
-  printf("ShellWe client\n");
+  printf("ShellWe client 2\n");
   // Open a TCP socket to connect to the server.
   int socket_descriptor = open_tcp_socket();
   (void)fprintf(stderr, "Client socket descriptor: %d\n", socket_descriptor);

@@ -55,9 +55,8 @@ void* recv_and_print(void* arg) {
 }
 
 void create_client_thread(accepted_socket* accepted) {
-  pthread_t id = 0;
-  pthread_create(&id, NULL, recv_and_print,
-                 (void*)&accepted->accepted_socketFD);
+  pthread_t idx = 0;
+  pthread_create(&idx, NULL, recv_and_print, (void*)accepted);
 }
 
 void start_accepting(int server_socketFD) {
