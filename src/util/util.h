@@ -1,8 +1,8 @@
 #pragma once
 
 #include <netinet/in.h>   // port, struct sockaddr_in, in_addr_t, in_port_t
-#include <stdnoreturn.h>  // noreturn
 #include <stdio.h>
+#include <stdnoreturn.h>  // noreturn
 
 /**
  * Print an error message and exit with a failure status code.
@@ -53,3 +53,5 @@ void close_tcp_socket(int socket_descriptor);
 struct sockaddr_in socket_address(in_addr_t addr, in_port_t port);
 
 FILE* get_socket_file(int socket);
+
+void remove_newline(char* str);

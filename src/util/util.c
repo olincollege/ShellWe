@@ -38,3 +38,13 @@ FILE* get_socket_file(int socket) {
   }
   return socket_file;
 }
+
+void remove_newline(char* str) {
+  int newIdx = 0;
+  for (int i = 0; str[i] != '\0'; i++) {
+    if (str[i] != '\n') {
+      str[newIdx++] = str[i];
+    }
+  }
+  str[newIdx] = '\0';
+}
