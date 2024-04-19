@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.22)
 
-project(ChatServer VERSION 1.0 DESCRIPTION "Chat Server Application"
+project(ShellWe VERSION 1.0 DESCRIPTION "Chat Server Application"
         LANGUAGES C)
 
 
@@ -30,19 +30,5 @@ add_subdirectory(src)
 include(CTest)
 find_library(CRITERION criterion REQUIRED)
 set(CRITERION_FLAGS --verbose -j1)
-
-add_subdirectory(test)
-add_subdirectory(include)
-
-# Add source files
-add_executable(ChatServer
-        src/main.c
-        src/util.c
-        include/util.h
-        src/client_handler.c
-        include/client_handler.h
-)
-
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
-target_link_libraries(ChatServer ${CMAKE_THREAD_LIBS_INIT})

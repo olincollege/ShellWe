@@ -1,12 +1,7 @@
 #pragma once
 
 #include <netinet/in.h>   // port, struct sockaddr_in, in_addr_t, in_port_t
-#include <stdint.h>       // uint16_t, uint32_t
 #include <stdnoreturn.h>  // noreturn
-
-// The port number that the server listens on. Include it here because both the
-// client and the server need this value.
-extern const uint16_t PORT;
 
 /**
  * Print an error message and exit with a failure status code.
