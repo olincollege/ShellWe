@@ -24,6 +24,7 @@ int main(void) {
 
   if (bind(socket_desc, (struct sockaddr*)&server, sizeof(server)) < 0) {
     perror("bind failed. Error");
+    free(n_clients);
     return 1;
   }
   puts("bind done");
