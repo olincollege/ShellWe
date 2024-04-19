@@ -25,7 +25,9 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g")
 
 set(CMAKE_C_CLANG_TIDY "clang-tidy")
 
-add_subdirectory(src)
+add_subdirectory(src/server)
+add_subdirectory(src/client)
+add_subdirectory(src/util)
 
 include(CTest)
 find_library(CRITERION criterion REQUIRED)
