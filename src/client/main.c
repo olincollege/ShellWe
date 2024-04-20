@@ -9,13 +9,20 @@
 #include "receiver.h"
 
 
-int main(void) {
+int main(int argc, char *argv[]) {
+  if (argc < 2) {
+    fprintf(stderr, "Usage: %s <IP address>\n", argv[0]);
+    return 1;
+  }
+
+  char *ip_address = argv[1];  // IP address passed as command-line argument
+
   char* message = NULL;
   pthread_t recv_thread = 0;
 
   int sock = open_tcp_socket();
 
-  struct sockaddr_in server = socket_address(SERVER_IP, SERVER_PORT);
+  struct sockaddr_in server = socket_address(ip_address, SERVER_PORT);
 
   if (connect(sock, (struct sockaddr*)&server, sizeof(server)) < 0) {
     close_tcp_socket(sock);
