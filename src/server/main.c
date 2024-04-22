@@ -9,14 +9,7 @@
 #include "../util/util.h"
 #include "client_handler.h"
 
-int main(int argc, char *argv[]) {
-  if (argc < 2) {
-    fprintf(stderr, "Usage: %s <IP address>\n", argv[0]);
-    return 1;
-  }
-
-  char *ip_address = argv[1];  // IP address passed as command-line argument
-
+int main(void) {
   int client_sockets[MAX_CLIENTS];
   int* n_clients = malloc(sizeof(int));
   *n_clients = 0;
@@ -27,7 +20,7 @@ int main(int argc, char *argv[]) {
   int socket_desc = open_tcp_socket();
   puts("Socket created");
 
-  struct sockaddr_in server = socket_address(ip_address, PORT);
+  struct sockaddr_in server = socket_address(SERVER_IP, PORT);
 
   if (bind(socket_desc, (struct sockaddr*)&server, sizeof(server)) < 0) {
     perror("bind failed. Error");

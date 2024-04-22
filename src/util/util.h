@@ -1,6 +1,6 @@
 #pragma once
 
-#define SERVER_IP "0.0.0.0"
+#define SERVER_IP INADDR_ANY
 
 enum {
   RECV_BUFFER_SIZE = 1024,
@@ -57,7 +57,7 @@ void close_tcp_socket(int socket_descriptor);
  * @param port The port number to bind or connect the socket to, in host order.
  * @return A sockaddr_in structure to use with bind/connect, in network order.
  */
-struct sockaddr_in socket_address(const char* addr, in_port_t port);
+struct sockaddr_in socket_address(in_addr_t addr, in_port_t port);
 
 FILE* get_socket_file(int socket);
 

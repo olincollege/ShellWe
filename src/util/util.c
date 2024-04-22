@@ -1,6 +1,5 @@
 #include "util.h"
 
-#include <arpa/inet.h>
 #include <netinet/in.h>
 #include <stdio.h>   // perror
 #include <stdlib.h>  // exit, EXIT_FAILURE
@@ -27,8 +26,8 @@ void close_tcp_socket(int socket_) {
   }
 }
 
-struct sockaddr_in socket_address(const char*addr, in_port_t port) {
-  struct sockaddr_in sockaddr = {.sin_addr = {inet_addr(addr)},
+struct sockaddr_in socket_address(in_addr_t addr, in_port_t port) {
+  struct sockaddr_in sockaddr = {.sin_addr = {htonl(addr)},
                                  .sin_port = htons(port),
                                  .sin_family = AF_INET};
   return sockaddr;
