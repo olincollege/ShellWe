@@ -122,7 +122,7 @@ resource "aws_instance" "chat_server" {
   instance_type     = var.instance_type
   availability_zone = var.availability_zone
 
-  key_name = "ec2_key"
+  key_name = "aws_key"
 
   network_interface {
     device_index         = 0
