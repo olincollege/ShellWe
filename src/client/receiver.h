@@ -2,7 +2,7 @@
 
 enum {
   RECV_BUFFER_SIZE = 1024,
-  SERVER_IP = 0x7f000001,
+  SERVER_IP = 0x0a4d8912,
   SERVER_PORT = 12345,
 };
 
