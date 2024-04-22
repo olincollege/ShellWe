@@ -4,7 +4,7 @@ sudo apt update -y
 sudo apt install -y gcc gdb make cmake clang-format \
 clang-tidy libcriterion-dev jq
 cd /home/ubuntu || exit
-git clone https://github.com/olincollege/ShellWe.git
+git clone --single-branch --branch aws https://github.com/olincollege/ShellWe.git
 cd ShellWe || exit
 mkdir build && cd build || exit
 cmake ..
