@@ -1,21 +1,32 @@
 variable "region" {
-  description = "The AWS region in which the resources will be created."
+  description = "The GCP region in which the resources will be created."
   type        = string
-  default     = "us-east-2"
+  default     = "us-east1"
 }
 
-variable "availability_zone" {
-  description = "The availability zone where the resources will reside."
+variable "zone" {
+  description = "The zone where the resources will reside."
   type        = string
-  default     = "us-east-2b"
+  default     = "us-east1-c"
 }
-variable "ami" {
-  description = "The ID of the Amazon Machine Image (AMI) used to create the EC2 instance."
+
+variable "image" {
+  description = "The image for compute instance."
   type        = string
-  default     = "ami-0a125f1b5cba564a0"
+  default     = "ubuntu-os-cloud/ubuntu-2204-lts"
 }
+variable "project_id" {
+  description = "The GCP project ID."
+  type        = string
+}
+
+variable "credentials_loc" {
+  description = "The GCP credential file."
+  type        = string
+}
+
 variable "instance_type" {
-  description = "The type of EC2 instance used to create the instance."
+  description = "The type of compute instance used to create the instance."
   type        = string
-  default     = "t2.micro"
+  default     = "e2-micro"
 }
