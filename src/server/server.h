@@ -2,7 +2,7 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 
-enum { MAX_BACKLOG = 10 };
+enum { MAX_BACKLOG = 10, PORT = 12345 };
 
 typedef struct {
   int listener;
