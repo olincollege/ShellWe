@@ -69,4 +69,11 @@ Test(socket_address, port_byte_order) {
   cr_assert(eq(u16, addr.sin_port, htons(port)));
 }
 
+// Check that \n is properly removed from a string
+Test(remove_newline, correct_removal) {
+  char str[] = "hello world\n";
+  remove_newline(str);
+  cr_assert_strings_eq(str, "hello world");
+}
+
 // NOLINTEND(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
