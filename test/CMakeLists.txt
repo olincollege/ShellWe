@@ -7,3 +7,13 @@ add_test(
         NAME test_util
         COMMAND test_util ${CRITERION_FLAGS}
 )
+
+add_executable(test_server test_server.c)
+target_link_libraries(test_server
+        PRIVATE server
+        PUBLIC ${CRITERION}
+)
+add_test(
+        NAME test_server
+        COMMAND test_server ${CRITERION_FLAGS}
+)
