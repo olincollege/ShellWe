@@ -2,6 +2,7 @@
 #include "sys/socket.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "../util/util.h"
 
 void* receive_message(void* socket_desc) {
   int sock = *(int*)socket_desc;
