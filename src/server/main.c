@@ -20,7 +20,7 @@ int main(void) {
   int socket_desc = open_tcp_socket();
   puts("Socket created");
 
-  struct sockaddr_in server = socket_address(INADDR_LOOPBACK, PORT);
+  struct sockaddr_in server = socket_address(SERVER_IP, PORT);
 
   if (bind(socket_desc, (struct sockaddr*)&server, sizeof(server)) < 0) {
     perror("bind failed. Error");
