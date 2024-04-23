@@ -1,7 +1,5 @@
 provider "aws" {
-  region  = "us-east-2"
-  # Choose the AWS region where the resources will be created.
-  profile = "chat_admin"
+  region  = var.region
 }
 
 # Create a vpc
