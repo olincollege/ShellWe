@@ -27,15 +27,7 @@ int main(void) {
   socklen_t addr_size = sizeof(client);
 
   while (1) {
-    int new_socket =
-        accept(server->listener, (struct sockaddr*)&client, &addr_size);
-    if (new_socket < 0) {
-      perror("accept failed");
-      break;
-    }
-    char ip_str[INET_ADDRSTRLEN];
-    inet_ntop(AF_INET, &(client.sin_addr), ip_str, INET_ADDRSTRLEN);
-    printf("Connection accepted from %s:%d\n", ip_str, ntohs(client.sin_port));
+    int new_socket = accept_client(server);
 
     pthread_mutex_lock(&clients_mutex);
     client_sockets[(*n_clients)++] = new_socket;

@@ -26,3 +26,22 @@ void listen_for_connections(server_t* server) {
     error_and_exit("Couldn't set socket to listen");
   }
 }
+
+void print_connection(struct sockaddr_in client) {
+  char ip_str[INET_ADDRSTRLEN];
+  inet_ntop(AF_INET, &(client.sin_addr), ip_str, INET_ADDRSTRLEN);
+  printf("Connection accepted from %s:%d\n", ip_str, ntohs(client.sin_port));
+}
+
+int accept_client(server_t* server) {
+  // int* client_sockets, pthread_mutex_t* clients_mutex, int* n_clients) {
+  struct sockaddr_in client;
+  socklen_t addr_size = sizeof(client);
+  int connected_socket = accept4(server->listener, (struct sockaddr*)&client,
+                                 &addr_size, SOCK_CLOEXEC);
+  if (connected_socket < 0) {
+    error_and_exit("Error accepting client");
+  }
+  print_connection(client);
+  return connected_socket;
+}
