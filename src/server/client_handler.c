@@ -9,7 +9,7 @@
 #include "../util/util.h"
 
 void assign_handler(client_handler_args_t* handler_args) {
-  pthread_t thread_id;
+  pthread_t thread_id = 0;
   if (pthread_create(&thread_id, NULL, handle_client, (void*)handler_args) !=
       0) {
     error_and_exit("Error creating thread");
