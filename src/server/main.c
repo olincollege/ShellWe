@@ -28,10 +28,7 @@ int main(void) {
 
   while (1) {
     int new_socket = accept_client(server);
-
-    pthread_mutex_lock(&clients_mutex);
-    client_sockets[(*n_clients)++] = new_socket;
-    pthread_mutex_unlock(&clients_mutex);
+    log_client(new_socket, client_sockets, &clients_mutex, n_clients);
     client_handler_args_t args = {new_socket, n_clients, client_sockets,
                                   &clients_mutex};
     if (pthread_create(&thread_id, NULL, handle_client, (void*)&args) != 0) {

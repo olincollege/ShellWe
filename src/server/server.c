@@ -34,7 +34,6 @@ void print_connection(struct sockaddr_in client) {
 }
 
 int accept_client(server_t* server) {
-  // int* client_sockets, pthread_mutex_t* clients_mutex, int* n_clients) {
   struct sockaddr_in client;
   socklen_t addr_size = sizeof(client);
   int connected_socket = accept4(server->listener, (struct sockaddr*)&client,
@@ -44,4 +43,11 @@ int accept_client(server_t* server) {
   }
   print_connection(client);
   return connected_socket;
+}
+
+void log_client(int socket_fd, int* client_sockets,
+                pthread_mutex_t* clients_mutex, int* n_clients) {
+  pthread_mutex_lock(clients_mutex);
+  client_sockets[(*n_clients)++] = socket_fd;
+  pthread_mutex_unlock(clients_mutex);
 }
