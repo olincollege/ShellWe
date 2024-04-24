@@ -33,6 +33,15 @@ void relay_message(char* message, ssize_t read_size, int* client_sockets,
   pthread_mutex_unlock(clients_mutex);
 }
 
+void handle_failed_receive(ssize_t read_size) {
+  if (read_size == 0) {
+    puts("Client disconnected");
+    (void)fflush(stdout);
+  } else if (read_size == -1) {
+    error_and_exit("Error receiving message from client");
+  }
+}
+
 void* handle_client(void* arg) {
   // Detach the current thread.
   pthread_detach(pthread_self());
@@ -53,12 +62,7 @@ void* handle_client(void* arg) {
                   clients_mutex);
   }
 
-  if (read_size == 0) {
-    puts("Client disconnected");
-    (void)fflush(stdout);
-  } else if (read_size == -1) {
-    perror("recv failed");
-  }
+  handle_failed_receive(read_size);
 
   // Remove the client
   pthread_mutex_lock(clients_mutex);
