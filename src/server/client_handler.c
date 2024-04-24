@@ -6,6 +6,17 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+#include "../util/util.h"
+
+void assign_handler(client_handler_args_t* handler_args) {
+  pthread_t thread_id;
+  if (pthread_create(&thread_id, NULL, handle_client, (void*)handler_args) !=
+      0) {
+    error_and_exit("Error creating thread");
+  }
+  puts("Handler Assigned");
+}
+
 void* handle_client(void* arg) {
   // Detach the current thread.
   pthread_detach(pthread_self());

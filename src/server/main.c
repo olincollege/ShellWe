@@ -31,13 +31,7 @@ int main(void) {
     log_client(new_socket, client_sockets, &clients_mutex, n_clients);
     client_handler_args_t args = {new_socket, n_clients, client_sockets,
                                   &clients_mutex};
-    if (pthread_create(&thread_id, NULL, handle_client, (void*)&args) != 0) {
-      perror("could not create thread");
-      free(n_clients);
-      return 1;
-    }
-
-    puts("Handler assigned");
+    assign_handler(&args);
   }
   free(n_clients);
   return 0;
