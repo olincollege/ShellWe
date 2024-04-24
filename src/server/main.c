@@ -15,16 +15,11 @@ int main(void) {
   int* n_clients = malloc(sizeof(int));
   *n_clients = 0;
   pthread_mutex_t clients_mutex = PTHREAD_MUTEX_INITIALIZER;
-  pthread_t thread_id;
-
-  struct sockaddr_in client;
 
   // init server
   struct sockaddr_in server_addr = socket_address(SERVER_IP, PORT);
   server_t* server = init_server(server_addr, MAX_BACKLOG);
   listen_for_connections(server);
-
-  socklen_t addr_size = sizeof(client);
 
   while (1) {
     int new_socket = accept_client(server);
