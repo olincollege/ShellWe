@@ -63,6 +63,7 @@ void* handle_client(void* arg) {
   // Detach the current thread.
   pthread_detach(pthread_self());
 
+  // Unpack thread args
   client_handler_args_t* handler_args = (client_handler_args_t*)arg;
 
   int* client_sockets = handler_args->client_sockets;
@@ -70,6 +71,7 @@ void* handle_client(void* arg) {
   int* n_clients = handler_args->n_clients;
   pthread_mutex_t* clients_mutex = handler_args->clients_mutex;
 
+  // Init message buffer
   char buffer[BUFFER_SIZE];
   ssize_t read_size = 0;
 
