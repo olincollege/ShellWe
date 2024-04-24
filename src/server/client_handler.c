@@ -17,6 +17,22 @@ void assign_handler(client_handler_args_t* handler_args) {
   puts("Handler Assigned");
 }
 
+void relay_message(char* message, ssize_t read_size, int* client_sockets,
+                   int self_socket, const int* n_clients,
+                   pthread_mutex_t* clients_mutex) {
+  pthread_mutex_lock(clients_mutex);
+  message[read_size] = '\0';  // Null terminate the message
+  // Lock the clients array
+  for (int i = 0; i < *n_clients; i++) {
+    if (client_sockets[i] != self_socket) {
+      if (send(client_sockets[i], message, strlen(message), 0) < 0) {
+        error_and_exit("Error sending message to client");
+      }
+    }
+  }
+  pthread_mutex_unlock(clients_mutex);
+}
+
 void* handle_client(void* arg) {
   // Detach the current thread.
   pthread_detach(pthread_self());
@@ -33,19 +49,8 @@ void* handle_client(void* arg) {
 
   // Receive messages from client
   while ((read_size = recv(sock, buffer, BUFFER_SIZE - 1, 0)) > 0) {
-    buffer[read_size] = '\0';  // Null terminate the message
-
-    // Lock the clients array
-    pthread_mutex_lock(clients_mutex);
-    for (int i = 0; i < *n_clients; i++) {
-      if (client_sockets[i] != sock) {
-        if (send(client_sockets[i], buffer, strlen(buffer), 0) < 0) {
-          perror("send failed");
-          continue;
-        }
-      }
-    }
-    pthread_mutex_unlock(clients_mutex);
+    relay_message(buffer, read_size, client_sockets, sock, n_clients,
+                  clients_mutex);
   }
 
   if (read_size == 0) {
