@@ -42,6 +42,23 @@ void handle_failed_receive(ssize_t read_size) {
   }
 }
 
+void remove_client(int* client_sockets, int self_socket, int* n_clients,
+                   pthread_mutex_t* clients_mutex) {
+  pthread_mutex_lock(clients_mutex);
+  for (int i = 0; i < *n_clients; i++) {
+    if (client_sockets[i] == self_socket) {
+      while (i < *n_clients - 1) {
+        client_sockets[i] = client_sockets[i + 1];
+        i++;
+      }
+      (*n_clients)--;
+      break;
+    }
+  }
+  pthread_mutex_unlock(clients_mutex);
+  close(self_socket);
+}
+
 void* handle_client(void* arg) {
   // Detach the current thread.
   pthread_detach(pthread_self());
@@ -63,21 +80,6 @@ void* handle_client(void* arg) {
   }
 
   handle_failed_receive(read_size);
-
-  // Remove the client
-  pthread_mutex_lock(clients_mutex);
-  for (int i = 0; i < *n_clients; i++) {
-    if (client_sockets[i] == sock) {
-      while (i < *n_clients - 1) {
-        client_sockets[i] = client_sockets[i + 1];
-        i++;
-      }
-      (*n_clients)--;
-      break;
-    }
-  }
-  pthread_mutex_unlock(clients_mutex);
-
-  close(sock);
+  remove_client(client_sockets, sock, n_clients, clients_mutex);
   return NULL;
 }
