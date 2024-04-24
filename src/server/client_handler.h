@@ -10,4 +10,6 @@ typedef struct {
   pthread_mutex_t* clients_mutex;  // Mutex for client socket FD array
 } client_handler_args_t;
 
+void assign_handler(client_handler_args_t* handler_args);
+
 void* handle_client(void* arg);
