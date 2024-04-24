@@ -45,8 +45,8 @@ int accept_client(server_t* server) {
   return connected_socket;
 }
 
-void log_client(int socket_fd, int* client_sockets,
-                pthread_mutex_t* clients_mutex, int* n_clients) {
+void log_client(int socket_fd, int* n_clients, int* client_sockets,
+                pthread_mutex_t* clients_mutex) {
   pthread_mutex_lock(clients_mutex);
   client_sockets[(*n_clients)++] = socket_fd;
   pthread_mutex_unlock(clients_mutex);

@@ -28,7 +28,7 @@ int main(void) {
 
   while (1) {
     int new_socket = accept_client(server);
-    log_client(new_socket, client_sockets, &clients_mutex, n_clients);
+    log_client(new_socket, n_clients, client_sockets, &clients_mutex);
     client_handler_args_t args = {new_socket, n_clients, client_sockets,
                                   &clients_mutex};
     assign_handler(&args);
