@@ -1,4 +1,7 @@
+find_package(Curses REQUIRED)
+include_directories(${CURSES_INCLUDE_DIR})
 add_library(client_receiver receiver.c receiver.h)
 add_executable(ChatClient main.c)
 target_link_libraries(ChatClient ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries(ChatClient PRIVATE util client_receiver )
+target_link_libraries(client_receiver ${CURSES_LIBRARIES})
