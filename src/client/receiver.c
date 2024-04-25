@@ -1,29 +1,29 @@
 #include "receiver.h"
-#include "sys/socket.h"
+
+#include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "../util/util.h"
+#include "sys/socket.h"
 
 void* receive_message(void* socket_desc) {
   int sock = *(int*)socket_desc;
   char buffer[RECV_BUFFER_SIZE];
-  char* recv_line = NULL;
 
   while (1) {
-    ssize_t len = recv(sock, buffer + 1, sizeof(buffer) - 2, 0);
+    ssize_t len = recv(sock, buffer, sizeof(buffer) - 1, 0);
     if (len > 0) {
-      buffer[0] = '\n';
-      buffer[len + 1] = '\0';
-      printf("%s\n", buffer);
-      printf(">> ");
-      (void)fflush(stdout);
+      buffer[len] = '\0';
+
+      printw("%s\n", buffer);
+      printw(">> ");
+      refresh();
     } else {
       perror("recv failed");
       break;
     }
   }
 
-  free(recv_line);
-  perror("recv failed");
   return NULL;
 }

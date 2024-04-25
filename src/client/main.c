@@ -1,4 +1,5 @@
 #include <arpa/inet.h>
+#include <ncurses.h>  // Include ncurses header
 #include <netinet/in.h>
 #include <pthread.h>
 #include <stdio.h>
@@ -9,13 +10,13 @@
 #include "../util/util.h"
 #include "receiver.h"
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   if (argc < 2) {
     fprintf(stderr, "Usage: %s <IP address>\n", argv[0]);
     return 1;
   }
 
-  char *ip_address = argv[1];  // IP address passed as command-line argument
+  char* ip_address = argv[1];  // IP address passed as command-line argument
 
   char* message = NULL;
   pthread_t recv_thread = 0;
@@ -36,25 +37,26 @@ int main(int argc, char *argv[]) {
     error_and_exit("could not create thread");
   }
 
-  size_t len = 0;
-  char* username = NULL; // replace with actual username
-  size_t username_len = 0;
-  char* prefix = " >> ";
-  printf("Enter username : ");
-  if (getline(&username, &username_len, stdin) == -1) {
-    close_tcp_socket(sock);
-    error_and_exit("Setting username failed");
-  }
+  char* username = NULL;
+  char* prefix[] = " >> ";
+
+  initscr();  // Initialize ncurses
+  cbreak();   // Disable line buffering
+  noecho();   // Do not echo user input to screen
+
+  printw("Enter username : ");
+  refresh();
+
+  getstr(username);  // Get username from user
 
   while (1) {
-    printf(">> ");
-    (void)fflush(stdout);
-    if (getline(&message, &len, stdin) == -1) {
-      close_tcp_socket(sock);
-      error_and_exit("Read failed");
-    }
+    printw("%s", prefix);
+    refresh();
 
-    size_t full_message_size = strlen(username) + strlen(prefix) + strlen(message) + 1;
+    getstr(message);  // Get message from user
+
+    size_t full_message_size =
+        strlen(username) + strlen(prefix) + strlen(message) + 1;
     char* full_message = malloc(full_message_size);
 
     if (full_message == NULL) {
@@ -62,8 +64,8 @@ int main(int argc, char *argv[]) {
       error_and_exit("Failed to allocate memory for message");
     }
 
-    if(snprintf(full_message, full_message_size, "%s%s%s", username, prefix,
-              message) == -1) {
+    if (snprintf(full_message, full_message_size, "%s%s%s", username, prefix,
+                 message) == -1) {
       close_tcp_socket(sock);
       free(full_message);
       error_and_exit("Failed to concatenate for full message");
@@ -78,4 +80,8 @@ int main(int argc, char *argv[]) {
 
     free(full_message);
   }
+
+  endwin();  // Cleanup ncurses before exiting
+
+  return 0;
 }
