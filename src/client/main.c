@@ -37,22 +37,17 @@ int main(int argc, char* argv[]) {
     error_and_exit("could not create thread");
   }
 
-  char* username = NULL;
-  char* prefix[] = " >> ";
-
-  initscr();  // Initialize ncurses
-  cbreak();   // Disable line buffering
-  noecho();   // Do not echo user input to screen
-
+  initscr();
+  char username[100];  // replace with actual username
+  char* prefix = " >> ";
   printw("Enter username : ");
-  refresh();
+  if (getstr(username) == -1) {
+    close_tcp_socket(sock);
+    error_and_exit("Setting username failed");
+  }
 
-  getstr(username);  // Get username from user
-
+  printw("Welcome to ShellWe, %s!", username);
   while (1) {
-    printw("%s", prefix);
-    refresh();
-
     getstr(message);  // Get message from user
 
     size_t full_message_size =
@@ -80,8 +75,6 @@ int main(int argc, char* argv[]) {
 
     free(full_message);
   }
-
   endwin();  // Cleanup ncurses before exiting
-
   return 0;
 }
