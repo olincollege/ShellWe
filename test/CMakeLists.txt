@@ -10,7 +10,7 @@ add_test(
 
 add_executable(test_server test_server.c)
 target_link_libraries(test_server
-        PRIVATE server
+        PRIVATE server util
         PUBLIC ${CRITERION}
 )
 add_test(
