@@ -23,6 +23,9 @@ int main(void) {
 
   while (1) {
     int new_socket = accept_client(server);
+    if (new_socket < 0) {
+      continue;
+    }
     log_client(new_socket, n_clients, client_sockets, &clients_mutex);
     client_handler_args_t args = {new_socket, n_clients, client_sockets,
                                   &clients_mutex};
