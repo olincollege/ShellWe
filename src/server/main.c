@@ -31,6 +31,5 @@ int main(void) {
                                   &clients_mutex};
     assign_handler(&args);
   }
-  free(n_clients);
   return 0;
 }
