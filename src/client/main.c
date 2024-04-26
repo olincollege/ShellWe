@@ -18,7 +18,7 @@ int main(int argc, char* argv[]) {
 
   char* ip_address = argv[1];  // IP address passed as command-line argument
 
-  char* message = NULL;
+  char* message = malloc(100 * sizeof(char));
   pthread_t recv_thread = 0;
 
   int sock = open_tcp_socket();
@@ -38,15 +38,17 @@ int main(int argc, char* argv[]) {
   }
 
   initscr();
-  char username[100];  // replace with actual username
+  char* username = malloc(100 * sizeof(char));  // replace with actual username
   char* prefix = " >> ";
   printw("Enter username : ");
   if (getstr(username) == -1) {
     close_tcp_socket(sock);
     error_and_exit("Setting username failed");
   }
-
+  refresh();
   printw("Welcome to ShellWe, %s!", username);
+  refresh();
+
   while (1) {
     getstr(message);  // Get message from user
 
@@ -54,24 +56,24 @@ int main(int argc, char* argv[]) {
         strlen(username) + strlen(prefix) + strlen(message) + 1;
     char* full_message = malloc(full_message_size);
 
-    if (full_message == NULL) {
-      close_tcp_socket(sock);
-      error_and_exit("Failed to allocate memory for message");
-    }
+    // if (full_message == NULL) {
+    //   close_tcp_socket(sock);
+    //   error_and_exit("Failed to allocate memory for message");
+    // }
 
-    if (snprintf(full_message, full_message_size, "%s%s%s", username, prefix,
-                 message) == -1) {
-      close_tcp_socket(sock);
-      free(full_message);
-      error_and_exit("Failed to concatenate for full message");
-    }
+    // if (snprintf(full_message, full_message_size, "%s%s%s", username, prefix,
+    //              message) == -1) {
+    //   close_tcp_socket(sock);
+    //   free(full_message);
+    //   error_and_exit("Failed to concatenate for full message");
+    // }
 
-    remove_newline(full_message);
+    // remove_newline(full_message);
 
-    if (send(sock, full_message, strlen(full_message), 0) < 0) {
-      close_tcp_socket(sock);
-      error_and_exit("Send failed");
-    }
+    // if (send(sock, full_message, strlen(full_message), 0) < 0) {
+    //   close_tcp_socket(sock);
+    //   error_and_exit("Send failed");
+    // }
 
     free(full_message);
   }
