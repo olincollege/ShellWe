@@ -2,6 +2,8 @@
 #include <criterion/new/assert.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 #include "../src/server/server.h"
 #include "../src/util/util.h"
@@ -50,6 +52,40 @@ Test(listen_for_connections, socket_listening) {
   cr_expect(ne(int, listening, 0));
   close_tcp_socket(server->listener);
   free(server);
+}
+
+// Check that the server accepts a client connection
+Test(accept_client, server_accepts) {
+  // Create server
+  struct sockaddr_in server_addr = socket_address(INADDR_ANY, 5555);
+  server_t* server = init_server(server_addr, MAX_BACKLOG);
+  listen_for_connections(server);
+
+  pid_t pid = -1;
+  pid = fork();
+
+  if (pid < 0) {
+    error_and_exit("Error forking process");
+  } else if (pid == 0) {
+    // Child, client
+    int sock = open_tcp_socket();
+    if (connect(sock, (struct sockaddr*)&server_addr, sizeof(server_addr)) <
+        0) {
+      close_tcp_socket(sock);
+      error_and_exit("Failed to connect to server");
+    }
+    close_tcp_socket(sock);
+    // NOLINTNEXTLINE(concurrency-mt-unsafe)
+    exit(EXIT_SUCCESS);
+  } else {
+    // Parent, server
+    cr_expect(ge(int, accept_client(server), 0));
+    if (waitpid(pid, NULL, 0) == -1) {
+      error_and_exit("Error awaiting child process");
+    }
+    close_tcp_socket(server->listener);
+    free(server);
+  }
 }
 
 // NOLINTEND(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
