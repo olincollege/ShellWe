@@ -6,6 +6,8 @@
 #include "../src/server/server.h"
 #include "../src/util/util.h"
 
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+
 // Check that the listener socket is successfully created.
 Test(init_server, listener_set_correctly) {
   struct sockaddr_in addr = socket_address(INADDR_ANY, 1111);
@@ -33,3 +35,21 @@ Test(init_server, backlog_set_correctly) {
   close_tcp_socket(server->listener);
   free(server);
 }
+
+// Check that the socket is accepting connections once it starts listening
+Test(listen_for_connections, socket_listening) {
+  struct sockaddr_in addr = socket_address(INADDR_ANY, 4444);
+  server_t* server = init_server(addr, MAX_BACKLOG);
+  listen_for_connections(server);
+  int listening = 0;
+  socklen_t option_len = sizeof(int);
+  cr_expect(ne(int,
+               getsockopt(server->listener, SOL_SOCKET, SO_ACCEPTCONN,
+                          &listening, &option_len),
+               -1));
+  cr_expect(ne(int, listening, 0));
+  close_tcp_socket(server->listener);
+  free(server);
+}
+
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
