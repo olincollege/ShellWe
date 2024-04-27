@@ -128,6 +128,9 @@ Test(log_client, client_logged) {
     *n_clients = 0;
     pthread_mutex_t clients_mutex = PTHREAD_MUTEX_INITIALIZER;
 
+    // We are intentionally checking a garbage value to make sure the value is
+    // changed.
+    // NOLINTNEXTLINE(clang-analyzer-core.uninitialized.Assign)
     int prior = client_sockets[0];
     log_client(new_socket, n_clients, client_sockets, &clients_mutex);
     cr_expect(ne(int, client_sockets[0], prior));
