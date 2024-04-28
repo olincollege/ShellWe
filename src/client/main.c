@@ -17,14 +17,37 @@ int main(int argc, char* argv[]) {
   }
 
   int* next_msg_pos = malloc(sizeof(int));
-  *next_msg_pos = 0;
-  const int MSGSIZE = 100;
+  *next_msg_pos = 1;
+  const size_t MSGSIZE = 100;
+
+  // ncurses window intialization
   initscr();
   cbreak();
-  scrollok(stdscr, TRUE);
   int row = 0;
   int col = 0;
-  getmaxyx(stdscr, row, col);  // get screen size
+  getmaxyx(stdscr, row, col);
+
+  // make 2 windows and get dimensions
+  WINDOW* output = newwin(row - 3, col, 0, 0);
+  int output_row = 0;
+  int output_col = 0;
+  getmaxyx(output, output_row, output_col);
+
+  WINDOW* input = newwin(3, col, row - 3, 0);
+  int input_row = 0;
+  int input_col = 0;
+  getmaxyx(input, input_row, input_col);
+  // construct `window_info_t` struct for each window
+  window_info_t* output_info = malloc(sizeof(window_info_t));
+  output_info->window = output;
+  output_info->row = output_row;
+  output_info->col = output_col;
+
+  window_info_t* input_info = malloc(sizeof(window_info_t));
+  input_info->window = input;
+  input_info->row = input_row;
+  input_info->col = input_col;
+  //
 
   char* ip_address = argv[1];  // IP address passed as command-line argument
 
@@ -40,46 +63,56 @@ int main(int argc, char* argv[]) {
     error_and_exit("connect failed. Error");
   }
 
-  printw("Connected to server\n");
+  printw("Successfully connected to server\n");
   refresh();
 
   recv_args_t* args = malloc(sizeof(recv_args_t));
   args->next_msg_pos = next_msg_pos;
   args->socket = sock;
+  args->input = input_info;
+  args->output = output_info;
 
   if (pthread_create(&recv_thread, NULL, receive_message, (void*)args) != 0) {
     close_tcp_socket(sock);
     error_and_exit("could not create thread");
   }
 
-  int type_start = row - 2;
   char* username = malloc(MSGSIZE * sizeof(char));
   char* prefix = " >> ";
-  printw("Plesae enter a username : ");
+  printw("Enter a username to continue : ");
+  refresh();
   if (getstr(username) == -1) {
     close_tcp_socket(sock);
     error_and_exit("Setting username failed");
   }
 
-  move(0, 0);
-  clrtoeol();
-  move(1, 0);
-  clrtoeol();
+  box(input, ' ', '-');
+  touchwin(input);
+  wrefresh(input);
+  box(output, ' ', '-');
+  touchwin(output);
+  wrefresh(output);
 
-  refresh();
-  mvprintw(0, 0, "Welcome to ShellWe, %s! Messages will be displayed below",
-           username);
+  char* title = "Welcome to ShellWe";
+  mvwprintw(output, 0,
+            (output_col - ((int)strlen(username) + (int)strlen(title))) / 2,
+            "Hi %s, %s", username, title);
+  wrefresh(output);
+
+  int type_start = input_row - 2;
 
   while (1) {
-    mvprintw(type_start, 0, "%s%s", "Me", prefix);
-    refresh();
-    getstr(message);  // Get message from user
+    mvwprintw(input, type_start, 1, "%s%s", "Me", prefix);
+    wrefresh(input);
+    wgetstr(input, message);  // Get message from user
+
     if (strcmp(message, "exit") == 0) {
+      endwin();  // Cleanup ncurses
       break;
     }
-
-    move(type_start, 0);  // Move cursor to the input area
-    clrtoeol();           // Clear what user typed previously
+    wmove(input, type_start, 7);  // Move cursor to the input area
+    wclrtoeol(input);             // Clear what user typed previously
+    wrefresh(input);
 
     size_t full_message_size =
         strlen(username) + strlen(prefix) + strlen(message) + 1;
@@ -103,11 +136,11 @@ int main(int argc, char* argv[]) {
       close_tcp_socket(sock);
       error_and_exit("Send failed");
     }
-    // printw(full_message);
 
     free(full_message);
   }
-  endwin();  // Cleanup ncurses before exiting
+  free(message);
+  free(username);
   free(next_msg_pos);
   printf("Successfully Exited ShellWe\n");
   return 0;
