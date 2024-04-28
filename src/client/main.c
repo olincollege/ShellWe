@@ -1,4 +1,5 @@
 #include <arpa/inet.h>
+#include <ncurses.h>  // Include ncurses header
 #include <netinet/in.h>
 #include <pthread.h>
 #include <stdio.h>
@@ -9,15 +10,48 @@
 #include "../util/util.h"
 #include "receiver.h"
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   if (argc < 2) {
-    fprintf(stderr, "Usage: %s <IP address>\n", argv[0]);
+    (void)fprintf(stderr, "Usage: %s <IP address>\n", argv[0]);
     return 1;
   }
 
-  char *ip_address = argv[1];  // IP address passed as command-line argument
+  int* next_msg_pos = malloc(sizeof(int));
+  *next_msg_pos = 1;
+  const size_t MSGSIZE = 100;
 
-  char* message = NULL;
+  // ncurses window intialization
+  initscr();
+  cbreak();
+  int row = 0;
+  int col = 0;
+  getmaxyx(stdscr, row, col);
+
+  // make 2 windows and get dimensions
+  WINDOW* output = newwin(row - 3, col, 0, 0);
+  int output_row = 0;
+  int output_col = 0;
+  getmaxyx(output, output_row, output_col);
+
+  WINDOW* input = newwin(3, col, row - 3, 0);
+  int input_row = 0;
+  int input_col = 0;
+  getmaxyx(input, input_row, input_col);
+  // construct `window_info_t` struct for each window
+  window_info_t* output_info = malloc(sizeof(window_info_t));
+  output_info->window = output;
+  output_info->row = output_row;
+  output_info->col = output_col;
+
+  window_info_t* input_info = malloc(sizeof(window_info_t));
+  input_info->window = input;
+  input_info->row = input_row;
+  input_info->col = input_col;
+  //
+
+  char* ip_address = argv[1];  // IP address passed as command-line argument
+
+  char* message = malloc(MSGSIZE * sizeof(char));
   pthread_t recv_thread = 0;
 
   int sock = open_tcp_socket();
@@ -29,32 +63,59 @@ int main(int argc, char *argv[]) {
     error_and_exit("connect failed. Error");
   }
 
-  puts("Connected to server\n");
+  printw("Successfully connected to server\n");
+  refresh();
 
-  if (pthread_create(&recv_thread, NULL, receive_message, (void*)&sock) != 0) {
+  recv_args_t* args = malloc(sizeof(recv_args_t));
+  args->next_msg_pos = next_msg_pos;
+  args->socket = sock;
+  args->input = input_info;
+  args->output = output_info;
+
+  if (pthread_create(&recv_thread, NULL, receive_message, (void*)args) != 0) {
     close_tcp_socket(sock);
     error_and_exit("could not create thread");
   }
 
-  size_t len = 0;
-  char* username = NULL; // replace with actual username
-  size_t username_len = 0;
+  char* username = malloc(MSGSIZE * sizeof(char));
   char* prefix = " >> ";
-  printf("Enter username : ");
-  if (getline(&username, &username_len, stdin) == -1) {
+  printw("Enter a username to continue : ");
+  refresh();
+  if (getstr(username) == -1) {
     close_tcp_socket(sock);
     error_and_exit("Setting username failed");
   }
 
-  while (1) {
-    printf(">> ");
-    (void)fflush(stdout);
-    if (getline(&message, &len, stdin) == -1) {
-      close_tcp_socket(sock);
-      error_and_exit("Read failed");
-    }
+  box(input, ' ', '-');
+  touchwin(input);
+  wrefresh(input);
+  box(output, ' ', '-');
+  touchwin(output);
+  wrefresh(output);
 
-    size_t full_message_size = strlen(username) + strlen(prefix) + strlen(message) + 1;
+  char* title = "Welcome to ShellWe";
+  mvwprintw(output, 0,
+            (output_col - ((int)strlen(username) + (int)strlen(title))) / 2,
+            "Hi %s, %s", username, title);
+  wrefresh(output);
+
+  int type_start = input_row - 2;
+
+  while (1) {
+    mvwprintw(input, type_start, 1, "%s%s", "Me", prefix);
+    wrefresh(input);
+    wgetstr(input, message);  // Get message from user
+
+    if (strcmp(message, "exit") == 0) {
+      endwin();  // Cleanup ncurses
+      break;
+    }
+    wmove(input, type_start, 7);  // Move cursor to the input area
+    wclrtoeol(input);             // Clear what user typed previously
+    wrefresh(input);
+
+    size_t full_message_size =
+        strlen(username) + strlen(prefix) + strlen(message) + 1;
     char* full_message = malloc(full_message_size);
 
     if (full_message == NULL) {
@@ -62,8 +123,8 @@ int main(int argc, char *argv[]) {
       error_and_exit("Failed to allocate memory for message");
     }
 
-    if(snprintf(full_message, full_message_size, "%s%s%s", username, prefix,
-              message) == -1) {
+    if (snprintf(full_message, full_message_size, "%s%s%s", username, prefix,
+                 message) == -1) {
       close_tcp_socket(sock);
       free(full_message);
       error_and_exit("Failed to concatenate for full message");
@@ -78,4 +139,9 @@ int main(int argc, char *argv[]) {
 
     free(full_message);
   }
+  free(message);
+  free(username);
+  free(next_msg_pos);
+  printf("Successfully Exited ShellWe\n");
+  return 0;
 }

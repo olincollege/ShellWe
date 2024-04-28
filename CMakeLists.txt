@@ -28,6 +28,7 @@ set(CMAKE_C_CLANG_TIDY "clang-tidy")
 add_subdirectory(src/server)
 add_subdirectory(src/client)
 add_subdirectory(src/util)
+add_subdirectory(src/tui)
 add_subdirectory(test)
 
 include(CTest)
