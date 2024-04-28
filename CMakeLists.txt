@@ -29,6 +29,7 @@ add_subdirectory(src/server)
 add_subdirectory(src/client)
 add_subdirectory(src/util)
 add_subdirectory(src/tui)
+add_subdirectory(test)
 
 include(CTest)
 find_library(CRITERION criterion REQUIRED)
