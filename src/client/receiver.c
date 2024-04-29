@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "../tui/tui_handler.h"
 #include "../util/util.h"
 #include "sys/socket.h"
 
@@ -32,7 +33,7 @@ void* receive_message(void* recv_args) {
 
       // print received message to output window
       wmove(output_w, 1, 1);
-      mvwprintw(output_w, *next_msg_pos, 1, "%s %d", buffer, *next_msg_pos);
+      mvwprintw(output_w, *next_msg_pos, 1, "%s", buffer);
       (*next_msg_pos)++;
       wrefresh(output_w);
 

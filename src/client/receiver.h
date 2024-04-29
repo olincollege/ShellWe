@@ -1,11 +1,5 @@
 #pragma once
-#include <ncurses.h>
-
-typedef struct {
-  WINDOW* window;
-  int row;
-  int col;
-} window_info_t;
+#include "../tui/tui_handler.h"
 
 typedef struct {
   int socket;
