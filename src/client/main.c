@@ -7,6 +7,7 @@
 #include <string.h>
 #include <sys/socket.h>
 
+#include "../tui/window_handler.h"
 #include "../util/util.h"
 #include "receiver.h"
 
@@ -20,34 +21,17 @@ int main(int argc, char* argv[]) {
   *next_msg_pos = 1;
   const size_t MSGSIZE = 100;
 
-  // ncurses window intialization
-  initscr();
-  cbreak();
+  // initialize ncurses screen
   int row = 0;
   int col = 0;
-  getmaxyx(stdscr, row, col);
+  init_scr(&row, &col);
 
-  // make 2 windows and get dimensions
-  WINDOW* output = newwin(row - 3, col, 0, 0);
-  int output_row = 0;
-  int output_col = 0;
-  getmaxyx(output, output_row, output_col);
+  // make 2 windows and generate window_info_t structs
+  window_info_t* output_info = init_win(row - 3, col, 0, 0);
+  WINDOW* output = output_info->window;
 
-  WINDOW* input = newwin(3, col, row - 3, 0);
-  int input_row = 0;
-  int input_col = 0;
-  getmaxyx(input, input_row, input_col);
-  // construct `window_info_t` struct for each window
-  window_info_t* output_info = malloc(sizeof(window_info_t));
-  output_info->window = output;
-  output_info->row = output_row;
-  output_info->col = output_col;
-
-  window_info_t* input_info = malloc(sizeof(window_info_t));
-  input_info->window = input;
-  input_info->row = input_row;
-  input_info->col = input_col;
-  //
+  window_info_t* input_info = init_win(3, col, row - 3, 0);
+  WINDOW* input = input_info->window;
 
   char* ip_address = argv[1];  // IP address passed as command-line argument
 
@@ -86,20 +70,17 @@ int main(int argc, char* argv[]) {
     error_and_exit("Setting username failed");
   }
 
-  box(input, ' ', '-');
-  touchwin(input);
-  wrefresh(input);
-  box(output, ' ', '-');
-  touchwin(output);
-  wrefresh(output);
+  make_box(input);
+  make_box(output);
 
   char* title = "Welcome to ShellWe";
-  mvwprintw(output, 0,
-            (output_col - ((int)strlen(username) + (int)strlen(title))) / 2,
-            "Hi %s, %s", username, title);
+  mvwprintw(
+      output, 0,
+      (output_info->col - ((int)strlen(username) + (int)strlen(title))) / 2,
+      "Hi %s, %s", username, title);
   wrefresh(output);
 
-  int type_start = input_row - 2;
+  int type_start = input_info->row - 2;
 
   while (1) {
     mvwprintw(input, type_start, 1, "%s%s", "Me", prefix);
