@@ -1,4 +1,4 @@
-#include "window_handler.h"
+#include "tui_handler.h"
 
 #include <ncurses.h>
 #include <stdlib.h>
