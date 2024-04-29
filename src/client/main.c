@@ -1,5 +1,5 @@
 #include <arpa/inet.h>
-#include <ncurses.h>  // Include ncurses header
+#include <ncurses.h>
 #include <netinet/in.h>
 #include <pthread.h>
 #include <stdio.h>
@@ -7,7 +7,7 @@
 #include <string.h>
 #include <sys/socket.h>
 
-#include "../tui/window_handler.h"
+#include "../tui/tui_handler.h"
 #include "../util/util.h"
 #include "receiver.h"
 

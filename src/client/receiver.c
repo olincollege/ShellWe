@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../tui/window_handler.h"
+#include "../tui/tui_handler.h"
 #include "../util/util.h"
 #include "sys/socket.h"
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "../tui/window_handler.h"
+#include "../tui/tui_handler.h"
 
 typedef struct {
   int socket;
