@@ -12,7 +12,7 @@ void assign_handler(client_handler_args_t* handler_args) {
   pthread_t thread_id = 0;
   if (pthread_create(&thread_id, NULL, handle_client, (void*)handler_args) !=
       0) {
-    error_and_exit("Error creating thread");
+    puts("Issue creating handler thread, continuing");
   }
   puts("Handler Assigned");
 }
@@ -42,7 +42,7 @@ static void relay_message(char* message, ssize_t read_size, int* client_sockets,
   for (int i = 0; i < *n_clients; i++) {
     if (client_sockets[i] != self_socket) {
       if (send(client_sockets[i], message, strlen(message), 0) < 0) {
-        error_and_exit("Error sending message to client");
+        puts("Issue sending message to client, continuing");
       }
     }
   }
@@ -59,7 +59,7 @@ static void handle_failed_receive(ssize_t read_size) {
     puts("Client disconnected");
     (void)fflush(stdout);
   } else if (read_size == -1) {
-    error_and_exit("Error receiving message from client");
+    puts("Issue receiving message from client, disconnecting client");
   }
 }
 

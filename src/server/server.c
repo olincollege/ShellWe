@@ -48,7 +48,8 @@ int accept_client(server_t* server) {
   int connected_socket = accept(server->listener, (struct sockaddr*)&client,
                                  &addr_size);
   if (connected_socket < 0) {
-    error_and_exit("Error accepting client");
+    puts("Issue accepting client, continuing");
+    return -1;
   }
   print_connection(client);
   return connected_socket;
