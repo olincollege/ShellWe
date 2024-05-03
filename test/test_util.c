@@ -73,7 +73,7 @@ Test(socket_address, port_byte_order) {
 Test(remove_newline, correct_removal) {
   char str[] = "hello world\n";
   remove_newline(str);
-  cr_assert_strings_eq(str, "hello world");
+  cr_assert_str_eq(str, "hello world");
 }
 
 // NOLINTEND(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
