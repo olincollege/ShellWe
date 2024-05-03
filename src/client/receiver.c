@@ -2,7 +2,6 @@
 
 #include <ncurses.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 #include "../tui/tui_handler.h"
 #include "../util/util.h"
@@ -16,12 +15,10 @@ void* receive_message(void* recv_args) {
   window_info_t* input = args->input;
   WINDOW* input_w = input->window;
   int input_row = input->row;
-  int input_col = input->col;
 
   window_info_t* output = args->output;
   WINDOW* output_w = output->window;
   int output_row = output->row;
-  int output_col = output->col;
 
   char buffer[RECV_BUFFER_SIZE];
   const int MESSAGE_LIMIT = output_row - 1;
@@ -50,7 +47,7 @@ void* receive_message(void* recv_args) {
       }
 
       // send cursor back to input window
-      wmove(input_w, input_row - 2, 7);
+      wmove(input_w, input_row - 2, DEFAULT_CURSOR_COL);
       wrefresh(input_w);
 
     } else {
