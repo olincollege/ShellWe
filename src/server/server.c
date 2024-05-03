@@ -1,5 +1,6 @@
 #include "server.h"
 
+#include <arpa/inet.h>
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,11 +30,11 @@ void listen_for_connections(server_t* server) {
 
 /**
  * Prints information about an accepted connection.
- * 
- * Prints information about a client connection accepted by the server. 
+ *
+ * Prints information about a client connection accepted by the server.
  * Extracts and converts the IP address and port number from the
  * provided sockaddr_in structure and prints them to stdout.
- * 
+ *
  * @param client The sockaddr_in containing information about the client.
  */
 static void print_connection(struct sockaddr_in client) {
@@ -45,8 +46,10 @@ static void print_connection(struct sockaddr_in client) {
 int accept_client(server_t* server) {
   struct sockaddr_in client;
   socklen_t addr_size = sizeof(client);
-  int connected_socket = accept(server->listener, (struct sockaddr*)&client,
-                                 &addr_size);
+  // We use accept because accept4 is not available on mac
+  int connected_socket =
+      // NOLINTNEXTLINE(android-cloexec-accept)
+      accept(server->listener, (struct sockaddr*)&client, &addr_size);
   if (connected_socket < 0) {
     puts("Issue accepting client, continuing");
     return -1;
