@@ -1,150 +1,76 @@
-provider "aws" {
-  region  = "us-east-2"
-  # Choose the AWS region where the resources will be created.
-  profile = "chat_admin"
+# Import the Google Cloud provider
+provider "google" {
+  project     = var.project_id
+  region      = var.region
+  zone        = var.zone
+  credentials = file(var.credentials_loc)
 }
 
-# Create a vpc
-resource "aws_vpc" "chat_vpc" {
-  cidr_block           = "10.0.0.0/16"
-  enable_dns_support   = true
-  enable_dns_hostnames = true
-  tags                 = {
-    name = "ChatVPC"
+# Create a VPC
+resource "google_compute_network" "chat_vpc" {
+  name                    = "chat-vpc"
+  auto_create_subnetworks = "false"
+}
+
+# Create a subnet
+resource "google_compute_subnetwork" "chat_subnet" {
+  name          = "chat-subnet"
+  region        = var.region
+  network       = google_compute_network.chat_vpc.self_link
+  ip_cidr_range = "10.0.1.0/24"
+}
+
+# Reserve a Static External IP Address
+resource "google_compute_address" "chat_static_ip" {
+  name   = "chat-ip"
+  region = var.region
+}
+
+# Create a firewall rule to allow SSH, TCP:12345
+resource "google_compute_firewall" "chat_firewall" {
+  name    = "chat-firewall"
+  network = google_compute_network.chat_vpc.self_link
+
+  allow {
+    protocol = "tcp"
+    ports    = ["22", "12345"]
   }
+
+  source_ranges = ["0.0.0.0/0"]
 }
 
-# Create an internet gateway
-resource "aws_internet_gateway" "chat_gw" {
-  vpc_id = aws_vpc.chat_vpc.id
-  tags   = {
-    name = "chat_gw"
-  }
-}
+# Create an e2-micro VM instance
+resource "google_compute_instance" "chat_server" {
+  name         = "chat-server"
+  machine_type = var.instance_type
+  zone         = var.zone
 
-# Create a custom route table
-resource "aws_route_table" "chat_route_table" {
-  vpc_id = aws_vpc.chat_vpc.id
-  tags   = {
-    name = "my_route_table"
-  }
-}
-# create route
-resource "aws_route" "chat_route" {
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = aws_internet_gateway.chat_gw.id
-  route_table_id         = aws_route_table.chat_route_table.id
-}
-
-# create a subnet
-resource "aws_subnet" "chat_subnet" {
-  vpc_id            = aws_vpc.chat_vpc.id
-  cidr_block        = "10.0.1.0/24"
-  availability_zone = var.availability_zone
-
-  tags = {
-    name = "chat_subnet"
-  }
-}
-
-# associate internet gateway to the route table by using subnet
-resource "aws_route_table_association" "chat_assoc" {
-  subnet_id      = aws_subnet.chat_subnet.id
-  route_table_id = aws_route_table.chat_route_table.id
-}
-
-# create security group to allow ingoing ports
-resource "aws_security_group" "chat_sg" {
-  name        = "chat_server_sg"
-  description = "security group for the EC2 instance of chat server"
-  vpc_id      = aws_vpc.chat_vpc.id
-  ingress     = [
-    {
-      description      = "ssh"
-      from_port        = 22
-      to_port          = 22
-      protocol         = "tcp"
-      cidr_blocks      = ["0.0.0.0/0", aws_vpc.chat_vpc.cidr_block]
-      ipv6_cidr_blocks = []
-      prefix_list_ids  = []
-      security_groups  = []
-      self             = false
-    },
-    {
-      description      = "TCP access for chat server"
-      from_port        = 4000
-      to_port          = 65535
-      protocol         = "tcp"
-      cidr_blocks      = ["0.0.0.0/0", aws_vpc.chat_vpc.cidr_block]
-      ipv6_cidr_blocks = []
-      prefix_list_ids  = []
-      security_groups  = []
-      self             = false
-    },
-  ]
-  egress = [
-    {
-      from_port        = 0
-      to_port          = 0
-      protocol         = "-1"
-      cidr_blocks      = ["0.0.0.0/0"]
-      description      = "Outbound traffic rule"
-      ipv6_cidr_blocks = []
-      prefix_list_ids  = []
-      security_groups  = []
-      self             = false
+  boot_disk {
+    initialize_params {
+      image = var.image
     }
-  ]
-  tags = {
-    name = "allow_ssh_and_chat_server"
   }
-}
-
-# create a network interface with private ip from step 4
-resource "aws_network_interface" "chat_net_interface" {
-  subnet_id       = aws_subnet.chat_subnet.id
-  security_groups = [aws_security_group.chat_sg.id]
-}
-
-# assign a elastic ip to the network interface created in step 7
-resource "aws_eip" "chat_eip" {
-  domain                    = "vpc"
-  network_interface         = aws_network_interface.chat_net_interface.id
-  associate_with_private_ip = aws_network_interface.chat_net_interface.private_ip
-  depends_on                = [
-    aws_internet_gateway.chat_gw, aws_instance.chat_server
-  ]
-}
-
-# Launch an EC2 instance in the subnet with the defined security group.
-resource "aws_instance" "chat_server" {
-  ami               = "ami-0a125f1b5cba564a0"
-  instance_type     = var.instance_type
-  availability_zone = var.availability_zone
-
-  key_name = "aws_key"
 
   network_interface {
-    device_index         = 0
-    network_interface_id = aws_network_interface.chat_net_interface.id
+    subnetwork = google_compute_subnetwork.chat_subnet.self_link
+
+    access_config {
+      nat_ip = google_compute_address.chat_static_ip.address
+    }
   }
-  user_data = file("${path.module}/setup_server.sh")
-  tags      = {
-    Name = "chat_server"
-  }
+
+  metadata_startup_script = file("${path.module}/setup_server.sh")
+  tags                    = ["chat-server"]
 }
 
+# Output the instance IP Address
 output "instance_public_ip" {
-  description = "Public IP address of the EC2 instance"
-  value       = aws_instance.chat_server.private_ip
+  value       = google_compute_instance.chat_server.network_interface[0].access_config[0].nat_ip
+  description = "The public IP address of the VM instance."
 }
 
-output "eip" {
-  description = "public Ip of eip"
-  value       = aws_eip.chat_eip.public_ip
-}
-
-output "subnet_id" {
-  description = "private ip(subnet)"
-  value       = aws_subnet.chat_subnet.id
+# Output the Static IP Address
+output "static_ip" {
+  value       = google_compute_address.chat_static_ip.address
+  description = "The static IP address assigned to the instance."
 }
