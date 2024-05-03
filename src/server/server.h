@@ -13,6 +13,8 @@ typedef struct {
 /**
  * Initializes a server structure with the provided IP address and max backlog.
  *
+ * NOTE: This function was taken from Assignment 8
+ *
  * Allocates memory for the server structure, creates a TCP socket using
  * open_tcp_socket(), and assigns the IP address and maximum backlog
  * to the server. The initialized server structure is returned.
@@ -25,6 +27,8 @@ server_t* init_server(struct sockaddr_in ip_addr, int max_backlog);
 
 /**
  * Listens for incoming connections on the server's socket.
+ *
+ * NOTE: This function was taken from Assignment 8
  *
  * Binds the server's listener socket to the provided address
  * and starts listening for incoming connections. If binding or setting the

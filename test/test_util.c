@@ -7,6 +7,9 @@
 
 // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
 
+// NOTE: All unit tests but the final one were taken and modified from
+// Assignment 8
+
 // Check that the descriptor returned is a valid socket descriptor value
 // (nonnegative integer).
 Test(open_tcp_socket, valid_descriptor_value) {

@@ -11,6 +11,7 @@
 
 // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
 
+// NOTE: This unit test was taken and modified from Assignment 8
 // Check that the listener socket is successfully created.
 Test(init_server, listener_set_correctly) {
   struct sockaddr_in addr = socket_address(INADDR_ANY, 1111);
@@ -20,6 +21,7 @@ Test(init_server, listener_set_correctly) {
   free(server);
 }
 
+// NOTE: This unit test was taken and modified from Assignment 8
 // Check that the address and port are set correctly.
 Test(init_server, addr_set_correctly) {
   struct sockaddr_in addr = socket_address(INADDR_ANY, 2222);
@@ -30,6 +32,7 @@ Test(init_server, addr_set_correctly) {
   free(server);
 }
 
+// NOTE: This unit test was taken and modified from Assignment 8
 // Check that the backlog size is set correctly.
 Test(init_server, backlog_set_correctly) {
   struct sockaddr_in addr = socket_address(INADDR_ANY, 2222);
