@@ -1,6 +1,8 @@
 #pragma once
 #include "../tui/tui_handler.h"
 
+enum { DEFAULT_CURSOR_COL = 7 };
+
 typedef struct {
   int socket;
   int* next_msg_pos;
@@ -19,4 +21,4 @@ typedef struct {
  * @returns The Null pointer.
  */
 
-void* receive_message(void* socket_desc);
+void* receive_message(void* recv_args);
