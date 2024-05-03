@@ -7,7 +7,7 @@ enum {
   SERVER_PORT = 12345,
 };
 
-#include <netinet/in.h>   // port, struct sockaddr_in, in_addr_t, in_port_t
+#include <netinet/in.h>  // port, struct sockaddr_in, in_addr_t, in_port_t
 #include <stdio.h>
 #include <stdnoreturn.h>  // noreturn
 
