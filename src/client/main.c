@@ -106,6 +106,8 @@ int main(int argc, char* argv[]) {
       error_and_exit("Failed to allocate memory for message");
     }
 
+    // Clang-tidy says to use snprintf_s, however that function is not available
+    // NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling)
     if (snprintf(full_message, full_message_size, "%s%s%s", username, prefix,
                  message) == -1) {
       close_tcp_socket(sock);
