@@ -14,6 +14,8 @@ enum {
 /**
  * Print an error message and exit with a failure status code.
  *
+ * NOTE: This function was taken from Assignment 8
+ *
  * Upon an error, print an error message with a desired prefix. The prefix
  * error_msg should describe the context in which the error occurred, followed
  * by a more specific message corresponding to errno set by whatever function or
@@ -27,6 +29,8 @@ noreturn void error_and_exit(const char* error_msg);
 /**
  * Attempt to open an IPv4 TCP socket.
  *
+ * NOTE: This function was taken from Assignment 8
+ *
  * Try to create a TCP socket on IPv4, and return the socket descriptor if
  * successful. If creating the socket is not successful, print an error message
  * and exit the program without returning from the function.
@@ -38,6 +42,8 @@ int open_tcp_socket(void);
 /**
  * Attempt to close an open socket.
  *
+ * NOTE: This function was taken from Assignment 8
+ *
  * Try to close an existing socket given its descriptor. If closing the socket
  * is not successful, print an error message and exit the program. In the case
  * of an error, this function does not return.
@@ -48,6 +54,8 @@ void close_tcp_socket(int socket_descriptor);
 
 /**
  * Return the sockaddr_in corresponding to an address and port.
+ *
+ * NOTE: This function was taken from Assignment 8
  *
  * Given an address and port number, convert their representations to network
  * byte order and assemble them into an approopriate sockaddr_in. The returned
