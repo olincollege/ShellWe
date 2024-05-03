@@ -17,9 +17,25 @@ void assign_handler(client_handler_args_t* handler_args) {
   puts("Handler Assigned");
 }
 
-void relay_message(char* message, ssize_t read_size, int* client_sockets,
-                   int self_socket, const int* n_clients,
-                   pthread_mutex_t* clients_mutex) {
+/**
+ * Relays a message to all connected clients except the sender.
+ *
+ * Relays the provided message to all connected clients except the sender
+ * identified by 'self_socket'. It locks the clients_mutex to ensure
+ * thread safety while accessing the client_sockets array. Upon successful
+ * relay of the message to all clients, the mutex is unlocked. In case of any
+ * error during message transmission, the program exits with an error message.
+ *
+ * @param message The message to relay.
+ * @param read_size The size of the message.
+ * @param client_sockets Array of client sockets.
+ * @param self_socket The socket of the sender.
+ * @param n_clients Pointer to the number of clients.
+ * @param clients_mutex Pointer to the mutex for accessing the clients array.
+ */
+static void relay_message(char* message, ssize_t read_size, int* client_sockets,
+                          int self_socket, const int* n_clients,
+                          pthread_mutex_t* clients_mutex) {
   pthread_mutex_lock(clients_mutex);
   message[read_size] = '\0';  // Null terminate the message
   // Lock the clients array
@@ -33,7 +49,12 @@ void relay_message(char* message, ssize_t read_size, int* client_sockets,
   pthread_mutex_unlock(clients_mutex);
 }
 
-void handle_failed_receive(ssize_t read_size) {
+/**
+ * Handles a failed message receive operation.
+ *
+ * @param read_size The size of the received message.
+ */
+static void handle_failed_receive(ssize_t read_size) {
   if (read_size == 0) {
     puts("Client disconnected");
     (void)fflush(stdout);
@@ -42,8 +63,22 @@ void handle_failed_receive(ssize_t read_size) {
   }
 }
 
-void remove_client(int* client_sockets, int self_socket, int* n_clients,
-                   pthread_mutex_t* clients_mutex) {
+/**
+ * Removes a client from the list of connected clients.
+ * 
+ * This function removes the client identified by 'self_socket' from the array
+ * of client sockets. It locks the clients_mutex to ensure thread safety while
+ * accessing and modifying the client_sockets array. Once the client is removed,
+ * the mutex is unlocked. Also closes the socket associated with the
+ * removed client.
+ * 
+ * @param client_sockets Array of client sockets.
+ * @param self_socket The socket of the client to be removed.
+ * @param n_clients Pointer to the number of clients.
+ * @param clients_mutex Pointer to the mutex for accessing the clients array.
+ */
+static void remove_client(int* client_sockets, int self_socket, int* n_clients,
+                          pthread_mutex_t* clients_mutex) {
   pthread_mutex_lock(clients_mutex);
   for (int i = 0; i < *n_clients; i++) {
     if (client_sockets[i] == self_socket) {

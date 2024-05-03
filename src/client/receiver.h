@@ -8,4 +8,15 @@ typedef struct {
   window_info_t* output;
 } recv_args_t;
 
-void* receive_message(void* recv_args);
+/**
+ * Receive messages from a socket and print them to stdout.
+ *
+ * Continuously receieves messages from the provided socket, then prints it out
+ * to stdout. Terminates if there is an error during receiving or the socket is
+ * closed.
+ *
+ * @param socket_desc A void pointer to the socket descriptor.
+ * @returns The Null pointer.
+ */
+
+void* receive_message(void* socket_desc);

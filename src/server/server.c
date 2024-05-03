@@ -27,7 +27,16 @@ void listen_for_connections(server_t* server) {
   }
 }
 
-void print_connection(struct sockaddr_in client) {
+/**
+ * Prints information about an accepted connection.
+ * 
+ * Prints information about a client connection accepted by the server. 
+ * Extracts and converts the IP address and port number from the
+ * provided sockaddr_in structure and prints them to stdout.
+ * 
+ * @param client The sockaddr_in containing information about the client.
+ */
+static void print_connection(struct sockaddr_in client) {
   char ip_str[INET_ADDRSTRLEN];
   inet_ntop(AF_INET, &(client.sin_addr), ip_str, INET_ADDRSTRLEN);
   printf("Connection accepted from %s:%d\n", ip_str, ntohs(client.sin_port));
@@ -36,8 +45,8 @@ void print_connection(struct sockaddr_in client) {
 int accept_client(server_t* server) {
   struct sockaddr_in client;
   socklen_t addr_size = sizeof(client);
-  int connected_socket = accept4(server->listener, (struct sockaddr*)&client,
-                                 &addr_size, SOCK_CLOEXEC);
+  int connected_socket = accept(server->listener, (struct sockaddr*)&client,
+                                 &addr_size);
   if (connected_socket < 0) {
     puts("Issue accepting client, continuing");
     return -1;
