@@ -21,4 +21,4 @@ typedef struct {
  * @returns The Null pointer.
  */
 
-void* receive_message(void* socket_desc);
+void* receive_message(void* recv_args);
