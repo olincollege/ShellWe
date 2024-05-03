@@ -91,8 +91,10 @@ int main(int argc, char* argv[]) {
       endwin();  // Cleanup ncurses
       break;
     }
-    wmove(input, type_start, 7);  // Move cursor to the input area
-    wclrtoeol(input);             // Clear what user typed previously
+    wmove(input, type_start,
+          (int)strlen("Me") + (int)strlen(prefix) +
+              1);      // Move cursor to the input area
+    wclrtoeol(input);  // Clear what user typed previously
     wrefresh(input);
 
     size_t full_message_size =
