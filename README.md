@@ -3,6 +3,45 @@
 `Shell` `We` chat? Using this application, a user can chat with other users in
 the chat room.
 
+## Building the Application
+
+To build the `ChatClient` or `ChatServer` application, you can use the 
+provided `CMakeLists.txt` file. The following steps will guide you through
+building the application.
+
+### Prerequisites
+
+- `cmake`
+- `make`
+- `gcc`
+- `ncurses` 
+- `clang-tidy`
+- `libcriterion-dev`
+- `pthread`
+- `git`
+
+### Steps
+
+```shell
+git clone https://github.com/olincollege/ShellWe.git
+cd ShellWe
+mkdir build && cd build
+cmake ..
+make
+# To test the server and utility functions
+cd src/test
+./test_server
+./test_util
+
+# To run the server locally
+cd ../server
+./ChatServer
+
+# To run the client locally
+cd ../client
+./ChatClient 0.0.0.0
+```
+
 ## Context
 
 Our chat application provides an interface for users to chat with each other
