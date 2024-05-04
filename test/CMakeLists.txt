@@ -3,6 +3,12 @@
 # conversion warnings for test code.
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-conversion -Wno-int-conversion")
 
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin"
+        AND CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "arm64")
+    include_directories(BEFORE SYSTEM "/opt/homebrew/include")
+    link_directories(BEFORE "/opt/homebrew/lib")
+endif()
+
 add_executable(test_util test_util.c)
 target_link_libraries(test_util
         PRIVATE util
