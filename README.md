@@ -29,12 +29,12 @@ mkdir build && cd build
 cmake ..
 make
 # To test the server and utility functions
-cd src/test
+cd /test
 ./test_server
 ./test_util
 
 # To run the server locally
-cd ../server
+cd ../src/server
 ./ChatServer
 
 # To run the client locally
