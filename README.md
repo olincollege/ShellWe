@@ -29,7 +29,7 @@ mkdir build && cd build
 cmake ..
 make
 # To test the server and utility functions
-cd /test
+cd test
 ./test_server
 ./test_util
 
